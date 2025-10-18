@@ -18,6 +18,7 @@ class BroadcastPlayer(TypedDict):
 
 class BroadcastTopResponse(TypedDict):
     """Minimal TypedDict for /api/broadcast/top response."""
+
     # List of active broadcasts
     active: list
     # List of upcoming broadcasts
