@@ -14,3 +14,13 @@ class BroadcastPlayer(TypedDict):
     rating: NotRequired[int]
     # Title, optional
     title: NotRequired[Title]
+
+
+class BroadcastTopResponse(TypedDict):
+    """Minimal TypedDict for /api/broadcast/top response."""
+    # List of active broadcasts
+    active: list
+    # List of upcoming broadcasts
+    upcoming: list
+    # List of past broadcasts
+    past: dict
