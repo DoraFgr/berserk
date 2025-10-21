@@ -5,6 +5,7 @@ To be released
 --------------
 
 * Added ``pgn_in_json`` parameter to ``client.games.export``.
+* Implement `broadcasts.get_top()` endpoint; typing fixes and validation.
 
 Thanks to @hsheth2 for their contributions to this release.
 
