@@ -33,7 +33,10 @@ test: ## run tests with pytest
 	uv run pytest tests
 
 test_record: ## run tests with pytest and record http requests
-	uv run pytest --record-mode=once
+	uv run pytest --record-mode=once tests
+
+test_rewrite: ## re-record all cassettes, overriding existing ones
+	uv run pytest --record-mode=rewrite tests
 
 typecheck: ## run type checking with pyright
 	uv run pyright berserk integration/local.py $(ARGS)
