@@ -130,7 +130,7 @@ When running tests regularly (e.g. with ``make test``), the recorded requests wi
 
 **Automated Weekly Refresh**:
 
-Cassettes are automatically refreshed weekly via GitHub Actions. If the Lichess API responses change, a PR will be created for review. This helps catch API schema changes early.
+Cassettes are automatically refreshed weekly via GitHub Actions. If the Lichess API responses change and tests fail, an issue will be created for review. This helps catch API schema changes early.
 
 **Recording Modes Summary**
 ^^^^^^^^^^^^^^^^^^^^^^^^
