@@ -97,6 +97,7 @@ class BroadcastByUser(TypedDict):
 
 
 class BroadcastsByUser(TypedDict):
+    fakeKey: int # fake key to force TypedDict to accept 0-length dicts
     currentPage: int
     maxPerPage: int
     currentPageResults: List[BroadcastByUser]
