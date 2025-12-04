@@ -7,6 +7,7 @@ To be released
 
 * Deprecate Python 3.9 support - minimum required version is now Python 3.10+. This does not mean the library will not work with Python 3.9, but it will not be tested against it anymore.
 
+* Added automated weekly cassette refresh workflow to detect API schema changes.
 * Added ``pgn_in_json`` parameter to ``client.games.export``.
 * Implement `broadcasts.get_top()` endpoint; typing fixes and validation.
 * Added ``client.broadcasts.search`` to search for broadcasts.

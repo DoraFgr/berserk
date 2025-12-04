@@ -1,0 +1,80 @@
+name: Weekly Cassette Refresh
+
+on:
+  schedule:
+    - cron: '0 2 * * 1'  # Every Monday at 2 AM UTC
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  refresh-cassettes:
+    # Workflow logic:
+    # 1. Re-record all cassettes with fresh API responses and run tests
+    # 2. IF tests pass -> Do nothing
+    # 3. IF tests fail -> Create issue (if no open issue with same title exists)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.13"
+          
+      - name: Install dependencies
+        run: make setup
+        
+      - name: Re-record cassettes and run tests
+        run: make test_rewrite
+        id: test
+        continue-on-error: true
+        
+      - name: Check for existing issue
+        if: steps.test.outcome != 'success'
+        id: existing_issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Search for open issues with the specific title to avoid duplicates
+          issues=$(gh issue list --search "in:title Weekly cassette refresh - Test failures detected" --state open --json number)
+          issue_count=$(echo "$issues" | jq 'length')
+          if [ "$issue_count" -gt 0 ]; then
+            issue_number=$(echo "$issues" | jq -r '.[0].number')
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "Existing issue #${issue_number} found, skipping creation"
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "No existing issue found"
+          fi
+          
+      - name: Create issue (tests failed - needs review)
+        if: steps.test.outcome != 'success' && steps.existing_issue.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          run_url="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          
+          gh issue create \
+            --title "Weekly cassette refresh - Test failures detected" \
+            --body "## Summary
+          Test failures detected during weekly cassette refresh with new API responses.
+          
+          ## Test Results
+          Tests failed with freshly recorded cassettes - API changes require investigation.
+          
+          ## Action Required
+          1. Review test failures in the [workflow run](${run_url})
+          2. Run locally: \`make test_rewrite\`
+          3. Investigate test output for the type of failure:
+             - **Schema validation errors**: TypedDict needs updates (missing/new/changed fields)
+             - **Data mismatches**: API behavior changed (counts, values, structure)
+             - **Other errors**: API errors, network issues, or test problems
+          4. Fix the identified issues (update TypedDicts, fix tests, etc.)
+          5. Run \`make test\` to verify fixes
+          6. Commit and create PR with cassette updates and fixes
+          
+          ---
+          
+          **Workflow**: This issue is automatically created when the weekly cassette refresh detects test failures. Close this issue once the problems are resolved."
