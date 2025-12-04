@@ -1,7 +1,7 @@
 import pytest
 import requests_mock
 
-from berserk import Client, OpeningStatistic
+from berserk import Client, OpeningStatistic, MastersOpeningStatistic
 
 from utils import validate, skip_if_older_3_dot_10
 
@@ -39,14 +39,14 @@ class TestLichessGames:
 
 
 class TestMasterGames:
+    @skip_if_older_3_dot_10
     @pytest.mark.vcr
     def test_result(self):
+        """Verify that the response matches the typed-dict"""
         res = Client().opening_explorer.get_masters_games(
             play=["d2d4", "d7d5", "c2c4", "c7c6", "c4d5"]
         )
-        assert res["white"] == 1667
-        assert res["black"] == 1300
-        assert res["draws"] == 4428
+        validate(MastersOpeningStatistic, res)
 
     @pytest.mark.vcr
     def test_export(self):
@@ -71,6 +71,7 @@ class TestMasterGames:
 class TestPlayerGames:
     @pytest.mark.vcr
     @pytest.mark.default_cassette("TestPlayerGames.results.yaml")
+    @pytest.mark.streaming_indexing  # Depends on Lichess indexing queue, cannot reliably re-record
     def test_wait_for_last_results(self):
         result = Client().opening_explorer.get_player_games(
             player="evachesss", color="white", wait_for_indexing=True
@@ -81,6 +82,7 @@ class TestPlayerGames:
 
     @pytest.mark.vcr
     @pytest.mark.default_cassette("TestPlayerGames.results.yaml")
+    @pytest.mark.streaming_indexing  # Shares cassette with non-deterministic streaming tests
     def test_get_first_result_available(self):
         result = Client().opening_explorer.get_player_games(
             player="evachesss",
@@ -99,6 +101,7 @@ class TestPlayerGames:
 
     @pytest.mark.vcr
     @pytest.mark.default_cassette("TestPlayerGames.results.yaml")
+    @pytest.mark.streaming_indexing  # Stream continues until indexing complete, unpredictable duration
     def test_stream(self):
         result = list(
             Client().opening_explorer.stream_player_games(

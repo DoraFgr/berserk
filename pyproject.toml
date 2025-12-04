@@ -57,6 +57,11 @@ dev = [
 [tool.pyright]
 typeCheckingMode = "strict"
 
+[tool.pytest.ini_options]
+markers = [
+    "streaming_indexing: marks tests that stream Lichess indexing updates and cannot be re-recorded",
+]
+
 [tool.ruff.format]
 docstring-code-format = true
 
