@@ -7,6 +7,7 @@ import logging
 from .base import BaseClient
 from ..types import (
     OpeningStatistic,
+    PlayerOpeningStatistic,
     VariantKey,
     Speed,
     OpeningExplorerRating,
@@ -109,7 +110,7 @@ class OpeningExplorer(BaseClient):
         recent_games: int | None = None,
         history: bool | None = None,
         wait_for_indexing: bool = True,
-    ) -> OpeningStatistic:
+    ) -> PlayerOpeningStatistic:
         """Get most played move from a position based on player games.
 
         The complete statistics for a player may not immediately be available at the
