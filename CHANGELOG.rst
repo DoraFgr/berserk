@@ -12,7 +12,7 @@ To be released
   * **puzzles.py**: Added ``flair``, ``patron``, ``patronColor``, and ``title`` optional fields to ``PuzzleUser``.
   * **team.py**: Added ``flair`` optional field to ``Team``.
   * **tournaments.py**: Added ``patronColor`` optional field to ``TournamentResult``.
-* Added automated weekly cassette refresh workflow to detect API schema changes.
+* Added automated live api healthcheck workflow to detect API schema changes.
 * Added ``pgn_in_json`` parameter to ``client.games.export``.
 * Implement `broadcasts.get_top()` endpoint; typing fixes and validation.
 * Added ``client.broadcasts.search`` to search for broadcasts.

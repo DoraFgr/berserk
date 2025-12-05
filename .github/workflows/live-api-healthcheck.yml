@@ -1,4 +1,4 @@
-name: Weekly Cassette Refresh
+name: Live API healthcheck
 
 on:
   schedule:
@@ -9,9 +9,10 @@ permissions:
   issues: write
 
 jobs:
-  refresh-cassettes:
+  live-api-healthcheck:
     # Workflow logic:
-    # 1. Re-record all cassettes with fresh API responses and run tests
+    # 1. Run tests against the live API (skip pytest-recording / vcr behavior)
+    #    to detect API changes that would make cassettes stale
     # 2. IF tests pass -> Do nothing
     # 3. IF tests fail -> Create issue (if no open issue with same title exists)
     runs-on: ubuntu-latest
@@ -26,8 +27,9 @@ jobs:
       - name: Install dependencies
         run: make setup
         
-      - name: Re-record cassettes and run tests
-        run: make test_rewrite
+      - name: Run tests against live API
+        # Use the --live-api pytest option (configured in tests/conftest.py)
+        run: make test_live_api
         id: test
         continue-on-error: true
         
@@ -38,7 +40,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           # Search for open issues with the specific title to avoid duplicates
-          issues=$(gh issue list --search "in:title Weekly cassette refresh - Test failures detected" --state open --json number)
+          issues=$(gh issue list --search "in:title Live API healthcheck - Test failures detected" --state open --json number)
           issue_count=$(echo "$issues" | jq 'length')
           if [ "$issue_count" -gt 0 ]; then
             issue_number=$(echo "$issues" | jq -r '.[0].number')
@@ -57,24 +59,22 @@ jobs:
           run_url="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           
           gh issue create \
-            --title "Weekly cassette refresh - Test failures detected" \
+            --title "Live API healthcheck - Test failures detected" \
             --body "## Summary
-          Test failures detected during weekly cassette refresh with new API responses.
+          Test failures detected when running tests against the live API.
           
           ## Test Results
-          Tests failed with freshly recorded cassettes - API changes require investigation.
+          The live-run produced failing tests; the exact failure mode may vary (schema change, data mismatch, timeout, auth error, flaky test, etc.).
           
           ## Action Required
           1. Review test failures in the [workflow run](${run_url})
-          2. Run locally: \`make test_rewrite\`
-          3. Investigate test output for the type of failure:
-             - **Schema validation errors**: TypedDict needs updates (missing/new/changed fields)
-             - **Data mismatches**: API behavior changed (counts, values, structure)
-             - **Other errors**: API errors, network issues, or test problems
-          4. Fix the identified issues (update TypedDicts, fix tests, etc.)
-          5. Run \`make test\` to verify fixes
-          6. Commit and create PR with cassette updates and fixes
+          2. Reproduce locally: \`make test_live_api\`
+          3. If API changes are confirmed, either:
+             - Update the code/tests to match the new API
+             - Re-record affected cassettes manually
+          4. To re-record cassettes, run locally: \`uv run pytest --record-mode=rewrite\`
+          5. Run \`make test\` to verify fixes against recorded cassettes before merging
           
           ---
           
-          **Workflow**: This issue is automatically created when the weekly cassette refresh detects test failures. Close this issue once the problems are resolved."
+          **Note**: This issue is automatically created when the live API healthcheck detects possible API changes. Close this issue once the problems are resolved."

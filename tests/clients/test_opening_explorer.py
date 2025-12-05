@@ -69,6 +69,14 @@ class TestMasterGames:
 
 
 class TestPlayerGames:
+    """
+    Streaming tests for player games.
+
+    - These tests use a streaming endpoint that returns an iterator over results.
+    - PyVCR expects HTTP requests to complete, but streaming endpoints keep the connection open.
+    - Often, PyVCR records the first chunk successfully, but sometimes it waits indefinitely for the request to finish, causing the test to hang.
+    - This behavior is intermittent, which can make debugging confusing.
+    """
     @pytest.mark.vcr
     @pytest.mark.default_cassette("TestPlayerGames.results.yaml")
     def test_wait_for_last_results(self):

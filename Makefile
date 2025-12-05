@@ -38,6 +38,9 @@ test_record: ## run tests with pytest and record http requests
 test_rewrite: ## re-record all cassettes, overriding existing ones
 	uv run pytest --record-mode=rewrite tests
 
+test_live_api: ## run tests with live API (no cassettes)
+	uv run pytest --live-api --live-api-throttle=1.0 tests
+
 typecheck: ## run type checking with pyright
 	uv run pyright berserk integration/local.py $(ARGS)
 

@@ -128,10 +128,6 @@ When running tests regularly (e.g. with ``make test``), the recorded requests wi
 
 ⚠️ Do not record sensitive information (tokens). See the `Filtering information documentation <https://vcrpy.readthedocs.io/en/latest/advanced.html#filter-sensitive-data-from-the-request). And manually check the committed data before pushing it to remote! For more control, [see custom filtering](https://vcrpy.readthedocs.io/en/latest/advanced.html#custom-response-filtering>`_.
 
-**Automated Weekly Refresh**:
-
-Cassettes are automatically refreshed weekly via GitHub Actions. If the Lichess API responses change and tests fail, an issue will be created for review. This helps catch API schema changes early.
-
 **Recording Modes Summary**
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
