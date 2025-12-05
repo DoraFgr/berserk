@@ -97,6 +97,7 @@ class BroadcastByUser(TypedDict):
 
 
 class BroadcastsByUser(TypedDict):
+    fakeKey: int #fakeKey to force type error.
     currentPage: int
     maxPerPage: int
     currentPageResults: List[BroadcastByUser]
