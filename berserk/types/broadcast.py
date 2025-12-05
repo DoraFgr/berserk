@@ -97,6 +97,7 @@ class BroadcastByUser(TypedDict):
 
 
 class BroadcastsByUser(TypedDict):
+    fakeEntryKey: int
     currentPage: int
     maxPerPage: int
     currentPageResults: List[BroadcastByUser]
